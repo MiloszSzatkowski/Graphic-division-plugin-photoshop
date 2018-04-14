@@ -14,24 +14,80 @@ $.level = 0;
 $.localize = true;
 
 var gScriptResult;
-//
-// Hello Word Script
-// Remember current unit settings and then set units to
-// the value expected by this script
+
+//no dialogs
+displayDialogs = DialogModes.NO  ;
+
+//units
 var originalUnit = preferences.rulerUnits;
 preferences.rulerUnits = Units.CM;
 
+var widthTreshold = 500.5;
+
 var cacheWidth = app.activeDocument.width;
-var cacheHeight = app.activeDocument.width;
+var cacheHeight = app.activeDocument.height;
+
+if (cacheWidth<widthTreshold) {
+  // alert("too short");
+  // return;
+}
 
 var maximumDivision = 490;
 var minimumDivision = 71;
 
 var divisionAmount = cacheWidth / maximumDivision;
 
-var dividedFully = Math.ceil(divisionAmount);
-var lastDivision = 
-Math.floor();
+var dividedFully = Math.floor(divisionAmount);
+var lastDivision = cacheWidth - dividedFully * 490;
+var preLastDivision;
+
+var lastDivisionIsTooSmall = false;
+
+if (lastDivision < minimumDivision) {
+var Sum = maximumDivision + lastDivision;
+preLastDivision = Sum / 2;
+lastDivision = preLastDivision;
+lastDivisionIsTooSmall = true;
+}
+
+var explicitAmount = dividedFully + 1;
+
+var divisionWidthsArr = [];
+
+if (!lastDivisionIsTooSmall) {
+  for (var i = 0; i < dividedFully; i++) {
+      divisionWidthsArr.push(maximumDivision);
+  }
+  divisionWidthsArr.push(lastDivision);
+} else {
+  for (var i = 0; i < dividedFully-1; i++) {
+      divisionWidthsArr.push(maximumDivision);
+  }
+  divisionWidthsArr.push(preLastDivision);
+  divisionWidthsArr.push(lastDivision);
+}
+
+// alert(divisionWidthsArr.toString());
+
+
+activeDocument.resizeCanvas(divisionWidthsArr[0], cacheHeight, AnchorPosition.MIDDLELEFT);
+
+activeDocument.resizeCanvas(4, cacheHeight, AnchorPosition.MIDDLELEFT);
+
+
+// var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
+var myPath = (app.activeDocument.path);
+// alert(myPath);
+
+var folderLoc = new Folder(myPath) + "/" + "division";
+//Check if it exist, if not create it.
+if(!folderLoc.exists) {
+  // folderLoc.create();
+}
+
+var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
+
+// SaveTIFF(new File(folderLoc + Name + ' ' + '.tif'));
 
 function SaveTIFF(saveFile){
 tiffSaveOptions = new TiffSaveOptions();
