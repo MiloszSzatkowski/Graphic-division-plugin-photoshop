@@ -91,18 +91,44 @@ if (!lastDivisionIsTooSmall) {
 
 // alert(divisionWidthsArr.toString());
 
+// var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
+var myPath = (app.activeDocument.path);
+// alert(myPath);
+
+var folderLoc = new Folder(myPath) + "/" + "division";
+//Check if it exist, if not create it.
+if(!folderLoc.exists) {
+  // folderLoc.create();
+}
+
+var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
+
+var counter = 0;
+
 if (dividedFully<2) {
 
   resizeForDivision(divisionWidthsArr[0], "left"); //1
   resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
+
+  //save!
+  SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
+
   undo (2);
 
+  counter++;
+
   resizeForDivision(divisionWidthsArr[0] - overlap, "right");
+  //save!
+  SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
 
 } else {
 
   resizeForDivision(divisionWidthsArr[0], "left"); //1
   resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
+
+  //save!
+  SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
+
   undo (2);
 
   var accumulate = divisionWidthsArr[0];
@@ -115,12 +141,22 @@ if (dividedFully<2) {
 
     resizeForDivision(divisionWidthsArr[j], "left"); //2
     resizeForDivision(divisionWidthsArr[j] + merger, "left"); //3
-    undo (3);
 
+    counter++;
+    SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
+    //save!
+
+    undo (3);
   }
 
+  counter++;
+
+  resizeForDivision(divisionWidthsArr[divisionWidthsArr.length] - overlap, "right");
+  //save!
+  SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
 }
 
+//obligatory function
 function undo (num){
  app.activeDocument.historyStates.length - num;
 }
@@ -132,19 +168,11 @@ function resizeForDivision (am , side) {
   if (side=="right") {
     activeDocument.resizeCanvas(am, cacheHeight, AnchorPosition.MIDDLERIGHT);
   }
+  if (side=="center") {
+    activeDocument.resizeCanvas(am, cacheHeight, AnchorPosition.MIDDLECENTER);
+  }
 }
 
-// var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
-var myPath = (app.activeDocument.path);
-// alert(myPath);
-
-var folderLoc = new Folder(myPath) + "/" + "division";
-//Check if it exist, if not create it.
-if(!folderLoc.exists) {
-  // folderLoc.create();
-}
-
-var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
 
 // SaveTIFF(new File(folderLoc + Name + ' ' + '.tif'));
 
