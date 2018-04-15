@@ -16,13 +16,34 @@ $.localize = true;
 var gScriptResult;
 
 //no dialogs
-displayDialogs = DialogModes.NO  ;
+// displayDialogs = DialogModes.NO  ;
 
 //units
 var originalUnit = preferences.rulerUnits;
 preferences.rulerUnits = Units.CM;
 
+//background templates
+  //white
+  var whiteColorObj = new CMYKColor();
+    var am = 0;
+    whiteColorObj.cyan = am;  whiteColorObj.magenta  = am;
+    whiteColorObj.yellow = am;  whiteColorObj.black = am;
+  //black
+  var blackColorObj = new CMYKColor();
+    var bm = 100;
+    blackColorObj.cyan = am;  blackColorObj.magenta  = am;
+    blackColorObj.yellow = am;  blackColorObj.black = am;
+
+//background to white
+app.backgroundColor.cmyk =  whiteColorObj;
+
+//add new layer in case the image is flat (faster than catch(e))
+var newLayerRef = app.activeDocument.artLayers.add();
+    app.activeDocument.mergeVisibleLayers();
+
 var widthTreshold = 500.5;
+var overlap = 1;
+var merger = 4;
 
 var cacheWidth = app.activeDocument.width;
 var cacheHeight = app.activeDocument.height;
@@ -52,6 +73,7 @@ lastDivisionIsTooSmall = true;
 
 var explicitAmount = dividedFully + 1;
 
+//create array with division widths
 var divisionWidthsArr = [];
 
 if (!lastDivisionIsTooSmall) {
@@ -69,11 +91,48 @@ if (!lastDivisionIsTooSmall) {
 
 // alert(divisionWidthsArr.toString());
 
+if (dividedFully<2) {
 
-activeDocument.resizeCanvas(divisionWidthsArr[0], cacheHeight, AnchorPosition.MIDDLELEFT);
+  resizeForDivision(divisionWidthsArr[0], "left"); //1
+  resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
+  undo (2);
 
-activeDocument.resizeCanvas(4, cacheHeight, AnchorPosition.MIDDLELEFT);
+  resizeForDivision(divisionWidthsArr[0] - overlap, "right");
 
+} else {
+
+  resizeForDivision(divisionWidthsArr[0], "left"); //1
+  resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
+  undo (2);
+
+  var accumulate = divisionWidthsArr[0];
+
+  for (var j = 1; j < divisionWidthsArr.length-1; j++) {
+
+    resizeForDivision(accumulate - overlap, "right"); //1
+
+    accumulate = accumulate + divisionWidthsArr[j];
+
+    resizeForDivision(divisionWidthsArr[j], "left"); //2
+    resizeForDivision(divisionWidthsArr[j] + merger, "left"); //3
+    undo (3);
+
+  }
+
+}
+
+function undo (num){
+ app.activeDocument.historyStates.length - num;
+}
+
+function resizeForDivision (am , side) {
+  if (side=="left") {
+    activeDocument.resizeCanvas(am, cacheHeight, AnchorPosition.MIDDLELEFT);
+  }
+  if (side=="right") {
+    activeDocument.resizeCanvas(am, cacheHeight, AnchorPosition.MIDDLERIGHT);
+  }
+}
 
 // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
 var myPath = (app.activeDocument.path);
