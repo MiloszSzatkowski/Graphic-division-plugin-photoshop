@@ -42,7 +42,7 @@ var newLayerRef = app.activeDocument.artLayers.add();
     app.activeDocument.mergeVisibleLayers();
 
 var widthTreshold = 500.5;
-var overlap = 1;
+var overlap = 10;
 var merger = 4;
 
 var cacheWidth = app.activeDocument.width;
@@ -89,6 +89,7 @@ if (!lastDivisionIsTooSmall) {
   divisionWidthsArr.push(lastDivision);
 }
 
+// alert(resizeCanvas().toString());
 // alert(divisionWidthsArr.toString());
 
 // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
@@ -104,8 +105,13 @@ if(!folderLoc.exists) {
 var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
 
 var counter = 0;
+var historyStatus;
+saveState();
+// alert(historyStatus);
 
 if (dividedFully<2) {
+
+  saveState();
 
   resizeForDivision(divisionWidthsArr[0], "left"); //1
   resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
@@ -113,40 +119,42 @@ if (dividedFully<2) {
   //save!
   SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
 
-  undo (2);
+  undo ();
 
   counter++;
 
-  resizeForDivision(divisionWidthsArr[0] - overlap, "right");
+  resizeForDivision(divisionWidthsArr[0], "right");
   //save!
   SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
 
 } else {
 
+  saveState();
+
   resizeForDivision(divisionWidthsArr[0], "left"); //1
   resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
 
   //save!
   SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
 
-  undo (2);
+  undo ();
 
   var accumulate = divisionWidthsArr[0];
 
   for (var j = 1; j < divisionWidthsArr.length-1; j++) {
 
-    resizeForDivision(accumulate - overlap, "right"); //1
+    saveState();
 
-    accumulate = accumulate + divisionWidthsArr[j];
+    resizeForDivision(divisionWidthsArr[j]*j - overlap , "right"); //1
 
-    resizeForDivision(divisionWidthsArr[j], "left"); //2
+    resizeForDivision(divisionWidthsArr[j] , "left"); //2
     resizeForDivision(divisionWidthsArr[j] + merger, "left"); //3
 
     counter++;
     SaveTIFF(new File(folderLoc + Name + counter + ' ' + '.tif'));
     //save!
 
-    undo (3);
+    undo ();
   }
 
   counter++;
@@ -157,8 +165,12 @@ if (dividedFully<2) {
 }
 
 //obligatory function
-function undo (num){
- app.activeDocument.historyStates.length - num;
+function undo (num) {
+ app.activeDocument.activeHistoryState = historyStatus;
+}
+
+function saveState () {
+  historyStatus = app.activeDocument.activeHistoryState ;
 }
 
 function resizeForDivision (am , side) {
