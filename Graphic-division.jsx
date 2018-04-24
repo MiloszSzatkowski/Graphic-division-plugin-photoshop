@@ -108,61 +108,58 @@ if(!folderLoc.exists) {
 }
 
 var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
-var suffix =  '_x_' +
-             Math.round(app.activeDocument.height.value);
 var counter = 0;
 var overMul;
 var overDiff;
 var historyStatus;
-saveState();
+var summ;
 // alert(historyStatus);
 
 ////////////////////////////////////////////////////////////////////
-if (dividedFully<2) {
 
-  saveState();
-  resizeForDivision(divisionWidthsArr[0], "left"); //1
-  resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
-  //save!
-  SaveTIFF(new File(folderLoc + Name + counter + '_' + Math.round() + suffix + '_' + '.tif'));
-  undo (historyStatus);
-  counter++;
-  resizeForDivision(lastDivision + overlap, "right");
-  //save!
-  SaveTIFF(new File(folderLoc + Name + counter + '_' +  Math.round(lastDivision) + suffix + '_' + '.tif'));
 
-} else {
 
-  saveState();
-  resizeForDivision(divisionWidthsArr[0], "left"); //1
-  resizeForDivision(divisionWidthsArr[0] + merger, "left"); //2
-  //save!
-  SaveTIFF(new File(folderLoc + Name + counter + '_' + Math.round(divisionWidthsArr[0]) + suffix + '_' + '.tif'));
-  undo (historyStatus);
-  var accumulate = divisionWidthsArr[0];
+for (var j = 0; j < divisionWidthsArr.length; j++) {
 
-  ////////////////
-  for (var j = 1; j < divisionWidthsArr.length-1; j++) {
+  if (j === 0) {
     saveState();
-    // alert(accumulate - overlap + " " + accumulate + " " + overlap);
-    accumulate = accumulate * j;
-    resizeForDivision(cacheWidth - accumulate - overlap, "right"); //1
-
-    resizeForDivision(divisionWidthsArr[j] + overlap, "left"); //2
-    resizeForDivision(divisionWidthsArr[j] + merger, "left"); //3
-    counter++;
-    SaveTIFF(new File(folderLoc + Name + '_' + counter + '_' + Math.round(divisionWidthsArr[j]) + suffix + '_'  + '.tif'));
-    //save!
-    undo (historyStatus);
+    resizeForDivision(divisionWidthsArr[j],"left");
+    resizeForDivision(divisionWidthsArr[j]+merger,"left");
+    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    Math.round(app.activeDocument.width.value) + "_x_" +
+    Math.round(app.activeDocument.height.value) +
+    '_' + '.tif'));
+    undo(historyStatus);
+  } else if (j !== divisionWidthsArr.length-1) {
+    saveState();
+    summ = 0;
+    for (var i = 0; i < j; i++) {
+      summ = summ + divisionWidthsArr[i];
+    }
+    resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
+    resizeForDivision(divisionWidthsArr[j],"left");
+    resizeForDivision(divisionWidthsArr[j]+merger,"left");
+    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    Math.round(app.activeDocument.width.value) + "_x_" +
+    Math.round(app.activeDocument.height.value) +
+    '_' + '.tif'));
+    undo(historyStatus);
+  } else {
+    saveState();
+    summ = 0;
+    for (var i = 0; i < j; i++) {
+      summ = summ + divisionWidthsArr[i];
+    }
+    resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
+    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    Math.round(app.activeDocument.width.value) + "_x_" +
+    Math.round(app.activeDocument.height.value) +
+    '_' + '.tif'));
+    undo(historyStatus);
   }
 
-  counter++;
-
-  // alert(lastDivision - overlap);
-  resizeForDivision(lastDivision - overlap, "right");
-  //save!
-  SaveTIFF(new File(folderLoc + Name + counter + '_' + Math.round(lastDivision) + suffix + '_' + '.tif'));
 }
+
 ///////////////////////////////////
 
 //obligatory function
@@ -194,8 +191,8 @@ tiffSaveOptions = new TiffSaveOptions();
 tiffSaveOptions.embedColorProfile = true;
 tiffSaveOptions.alphaChannels = true;
 tiffSaveOptions.layers = true;
-tiffSaveOptions.imageCompression = TIFFEncoding.JPEG;
-tiffSaveOptions.jpegQuality=10;
+tiffSaveOptions.imageCompression = TIFFEncoding.TIFFLZW;
+// tiffSaveOptions.jpegQuality=12;
 activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 }
 
