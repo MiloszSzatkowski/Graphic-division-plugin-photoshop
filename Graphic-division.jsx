@@ -18,6 +18,18 @@ var gScriptResult;
 //no dialogs
 // displayDialogs = DialogModes.NO  ;
 
+//config
+// var appdata = $.getenv("APPDATA")  
+// var xmlFile = new File(appdata + "\\adobe\\ExportAsPNG_Settings.xml");
+// xmlFile.open("r");
+// var xml = new XML (xmlFile.read());
+// xml.DefaultSavePath = "Testing AGAIN";
+// xmlFile.close();
+// xmlFile.open("w");
+// xmlFile.write(xml);
+// xmlFile.close();
+//
+
 //save history state
 var startHistory = app.activeDocument.activeHistoryState ;
 
