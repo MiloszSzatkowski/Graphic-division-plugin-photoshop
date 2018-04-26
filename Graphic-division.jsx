@@ -19,7 +19,7 @@ var gScriptResult;
 // displayDialogs = DialogModes.NO  ;
 
 //config
-// var appdata = $.getenv("APPDATA")  
+// var appdata = $.getenv("APPDATA")
 // var xmlFile = new File(appdata + "\\adobe\\ExportAsPNG_Settings.xml");
 // xmlFile.open("r");
 // var xml = new XML (xmlFile.read());
@@ -46,8 +46,8 @@ preferences.rulerUnits = Units.CM;
   //black
   var blackColorObj = new CMYKColor();
     var bm = 100;
-    blackColorObj.cyan = am;  blackColorObj.magenta  = am;
-    blackColorObj.yellow = am;  blackColorObj.black = am;
+    blackColorObj.cyan = bm;  blackColorObj.magenta  = bm;
+    blackColorObj.yellow = bm;  blackColorObj.black = bm;
 
 //background to white
 app.backgroundColor.cmyk =  whiteColorObj;
@@ -59,6 +59,7 @@ var newLayerRef = app.activeDocument.artLayers.add();
 var widthTreshold = 500.5;
 var overlap = 1;
 var merger = 4;
+var frameSize = 0.2;
 
 var cacheWidth = app.activeDocument.width.value;
 var cacheHeight = app.activeDocument.height.value;
@@ -113,7 +114,9 @@ if (!lastDivisionIsTooSmall) {
 var myPath = (app.activeDocument.path);
 // alert(myPath);
 
-var folderLoc = new Folder(myPath) + "/" + "division";
+var folderLoc = new Folder(myPath) + "/";
+var suffix = "_bryt_"
+
 //Check if it exist, if not create it.
 if(!folderLoc.exists) {
   // folderLoc.create();
@@ -137,7 +140,8 @@ for (var j = 0; j < divisionWidthsArr.length; j++) {
     saveState();
     resizeForDivision(divisionWidthsArr[j],"left");
     resizeForDivision(divisionWidthsArr[j]+merger,"left");
-    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    frame ();
+    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
     Math.round(app.activeDocument.width.value) + "_x_" +
     Math.round(app.activeDocument.height.value) +
     '_' + '.tif'));
@@ -151,7 +155,8 @@ for (var j = 0; j < divisionWidthsArr.length; j++) {
     resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
     resizeForDivision(divisionWidthsArr[j],"left");
     resizeForDivision(divisionWidthsArr[j]+merger,"left");
-    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    frame ();
+    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
     Math.round(app.activeDocument.width.value) + "_x_" +
     Math.round(app.activeDocument.height.value) +
     '_' + '.tif'));
@@ -163,7 +168,8 @@ for (var j = 0; j < divisionWidthsArr.length; j++) {
       summ = summ + divisionWidthsArr[i];
     }
     resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
-    SaveTIFF(new File(folderLoc + Name + " 0" + j + '_ ' +
+    frame ();
+    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
     Math.round(app.activeDocument.width.value) + "_x_" +
     Math.round(app.activeDocument.height.value) +
     '_' + '.tif'));
@@ -193,6 +199,17 @@ function resizeForDivision (am , side) {
   if (side=="center") {
     activeDocument.resizeCanvas(am, cacheHeight, AnchorPosition.MIDDLECENTER);
   }
+}
+
+function frame () {
+  app.backgroundColor.cmyk =  blackColorObj;
+
+    activeDocument.resizeCanvas(
+      app.activeDocument.width.value + frameSize,
+      app.activeDocument.height.value + frameSize,
+      AnchorPosition.MIDDLECENTER);
+
+  app.backgroundColor.cmyk =  whiteColorObj;
 }
 
 
