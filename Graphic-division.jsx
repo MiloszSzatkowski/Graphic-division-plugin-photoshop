@@ -192,7 +192,8 @@ function divide (){
         resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
         resizeForDivision(divisionWidthsArr[j]+overlap,"left");
 
-        drawLines("both");
+        drawLines("left");
+        drawLines("right");
         frame ();
 
         SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
@@ -329,7 +330,7 @@ function ParaDrawLines (startXY, endXY, width ) {
     executeAction( charIDToTypeID('Draw'), desc, DialogModes.NO );
 }
 
-var startPoint, endPoint, lineWidth, lines, y_cord, initialCmyk, multi;
+var startPoint, endPoint, lineWidth, lines, y_cord, initialCmyk, multi, factor, lines_Distance;
 
 function drawLines (side){
   //
@@ -337,33 +338,39 @@ function drawLines (side){
   // initialCmyk = app.foreground.cmyk;
   // app.foreground.cmyk =  blackColorObj;
 
-  //correct inch to cm
-  multi = app.activeDocument.resolution/2.54;
+  //correct cm to px
+  app.preferences.rulerUnits = Units.CM;
+  oCM = app.activeDocument.width.value;
+  app.preferences.rulerUnits = Units.PIXELS;
+  oPX = app.activeDocument.width.value;
+  factor = oPX/oCM; // --> factor
+  // alert(rmmW +"mm / "+rpixW +"pix\n factor " + factor);
 
   lines = [];
-  lineWidth = pref.lineWidth * multi;
-  lineLongitude = pref.lineLongitude * multi;
+  lineWidth = pref.lineWidth * factor;
+  lineLongitude = pref.lineLongitude * factor;
+  lines_Distance = pref.lines_Distance * factor;
 
   //index has to be an integer
-  num_of_lines = parseInt(Math.ceil( app.activeDocument.height.value / pref.lines_Distance));
+  num_of_lines = parseInt(Math.floor( app.activeDocument.height.value / lines_Distance));
 
   // populate array accord.:
   // passing array values to drawing function
   // startPoint = [118,434];
   // endPoint = [335,434];
 
-  if (side == "right" || side == "both"){
+  if (side == "right"){
     for (var i = 1; i < num_of_lines+1; i++) {
-      y_cord = pref.lines_Distance*i;
+      y_cord = lines_Distance*i;
       lines[i] =  {
         start : [ app.activeDocument.width.value - lineLongitude , y_cord],
         end : [ app.activeDocument.width.value , y_cord]
       }
 
     }
-  } else if (side == "left" || side == "both") {
+  } else if (side == "left") {
     for (var i = 1; i < num_of_lines+1; i++) {
-      y_cord = pref.lines_Distance*i;
+      y_cord = lines_Distance*i;
 
       lines[i] =  {
         start : [ 0, y_cord],
@@ -381,6 +388,8 @@ function drawLines (side){
   }
   //make foreground to whatever color it was
    // app.foreground.cmyk = initialCmyk;
+
+   app.preferences.rulerUnits = Units.CM;
 }
 
 function SaveTIFF(saveFile){

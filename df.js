@@ -45,8 +45,8 @@ var epson = new PrefObj(
   true, //optimal
   "_en_bryt_", // suffix
   50, //lines_Distance
-  1, //lineWidth
-  100 //lineLongitude
+  0.3, //lineWidth
+  1 //lineLongitude
 );
 
 function PrefObj (
