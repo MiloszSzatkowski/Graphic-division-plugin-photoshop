@@ -18,20 +18,31 @@ var gScriptResult;
 //no dialogs
 // displayDialogs = DialogModes.NO  ;
 
+//add json parser
+// var scriptF = new File((new File($.fileName)).parent + "/json2.js");
+//     scriptF.open('r');
+//     var jsonParser = scriptF.read();
+//     scriptF.close();
+
 //config
-// var appdata = $.getenv("APPDATA")
-// var xmlFile = new File(appdata + "\\adobe\\ExportAsPNG_Settings.xml");
-// xmlFile.open("r");
-// var xml = new XML (xmlFile.read());
-// xml.DefaultSavePath = "Testing AGAIN";
-// xmlFile.close();
-// xmlFile.open("w");
-// xmlFile.write(xml);
-// xmlFile.close();
+
+// var jsfile = new File((new File($.fileName)).parent + "/Config/default.js");
 //
+//      jsfile.open("r");
+//      config = eval(jsfile.read());
+//      jsfile.close();
+
+//write to js
+// jsfile.open('w')
+// jsfile.write(data.toSource())
+// jsfile.close()
+
+#include df.js;
+
+alert(pref.material);
 
 //save history state
-var startHistory = app.activeDocument.activeHistoryState ;
+var startHistory;
 
 //units
 var originalUnit = preferences.rulerUnits;
@@ -56,10 +67,10 @@ app.backgroundColor.cmyk =  whiteColorObj;
 var newLayerRef = app.activeDocument.artLayers.add();
     app.activeDocument.mergeVisibleLayers();
 
-var widthTreshold = 500.5;
-var overlap = 1;
-var merger = 4;
-var frameSize = 0.2;
+var widthTreshold = pref.widthTreshold;
+var overlap = pref.overlap;
+var merger = pref.merger;
+var frameSize = pref.frameSize;
 
 var cacheWidth = app.activeDocument.width.value;
 var cacheHeight = app.activeDocument.height.value;
@@ -71,19 +82,29 @@ if (cacheWidth<widthTreshold) {
   // return;
 }
 
-var maximumDivision = 490;
-var minimumDivision = 71;
+var maximumDivision = pref.maximumDivision;
+var minimumDivision = pref.minimumDivision;
+var optimalDivision = pref.optimalDivision;
 
 var divisionAmount = cacheWidth / maximumDivision;
 
 var dividedFully = Math.floor(divisionAmount);
-var lastDivision = cacheWidth - dividedFully * 490;
+var lastDivision = cacheWidth - dividedFully * maximumDivision;
 var preLastDivision;
 
-var lastDivisionIsTooSmall = false;
+var optimal = pref.optimal;
 
-if (lastDivision < minimumDivision) {
-var Sum = maximumDivision + lastDivision;
+var lastDivisionIsTooSmall = false;
+var Sum;
+
+if (lastDivision < minimumDivision && optimal == true) {
+var Deq = optimalDivision - lastDivision;
+Sum = lastDivision + Deq;
+lastDivision = Sum;
+preLastDivision = maximumDivision - Sum;
+lastDivisionIsTooSmall = true;
+} else if (optimal === false) {
+Sum = maximumDivision + lastDivision;
 preLastDivision = Sum / 2;
 lastDivision = preLastDivision;
 lastDivisionIsTooSmall = true;
@@ -111,18 +132,13 @@ if (!lastDivisionIsTooSmall) {
 // alert(divisionWidthsArr.toString());
 
 // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
-var myPath = (app.activeDocument.path);
+var myPath;
 // alert(myPath);
 
-var folderLoc = new Folder(myPath) + "/";
-var suffix = "_bryt_"
+var folderLoc;
+var suffix = pref.suffix;
 
-//Check if it exist, if not create it.
-if(!folderLoc.exists) {
-  // folderLoc.create();
-}
-
-var Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
+var Name;
 var counter = 0;
 var overMul;
 var overDiff;
@@ -131,52 +147,82 @@ var summ;
 // alert(historyStatus);
 
 ////////////////////////////////////////////////////////////////////
+// all documents
+for (var i = 0; i < app.documents.length; i++) {
+  app.activeDocument = app.documents[i];
+  // divide ();
+}
 
 
+//////////////////
 
-for (var j = 0; j < divisionWidthsArr.length; j++) {
+function divide (){
 
-  if (j === 0) {
-    saveState();
-    resizeForDivision(divisionWidthsArr[j],"left");
-    resizeForDivision(divisionWidthsArr[j]+merger,"left");
-    frame ();
-    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
-    Math.round(app.activeDocument.width.value) + "_x_" +
-    Math.round(app.activeDocument.height.value) +
-    '_' + '.tif'));
-    undo(historyStatus);
-  } else if (j !== divisionWidthsArr.length-1) {
-    saveState();
-    summ = 0;
-    for (var i = 0; i < j; i++) {
-      summ = summ + divisionWidthsArr[i];
+  myPath = (app.activeDocument.path);
+
+  folderLoc = new Folder(myPath) + "/";
+
+  Name = app.activeDocument.name.replace(/\.[^\.]+$/, '');
+  //init history
+  startHistory = app.activeDocument.activeHistoryState ;
+
+  for (var j = 0; j < divisionWidthsArr.length; j++) {
+
+    if (j === 0) {
+      saveState();
+      resizeForDivision(divisionWidthsArr[j],"left");
+      resizeForDivision(divisionWidthsArr[j]+merger,"left");
+      frame ();
+
+      SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
+      Math.round(app.activeDocument.width.value) + "_x_" +
+      Math.round(app.activeDocument.height.value) +
+      '_' + '.tif'));
+
+      undo(historyStatus);
+    } else if (j !== divisionWidthsArr.length-1) {
+      saveState();
+      summ = 0;
+      for (var i = 0; i < j; i++) {
+        summ = summ + divisionWidthsArr[i];
+      }
+      resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
+      resizeForDivision(divisionWidthsArr[j],"left");
+      resizeForDivision(divisionWidthsArr[j]+merger,"left");
+      frame ();
+
+      SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
+      Math.round(app.activeDocument.width.value) + "_x_" +
+      Math.round(app.activeDocument.height.value) +
+      '_' + '.tif'));
+
+      undo(historyStatus);
+    } else {
+      saveState();
+      summ = 0;
+      for (var i = 0; i < j; i++) {
+        summ = summ + divisionWidthsArr[i];
+      }
+      resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
+      frame ();
+
+      SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
+      Math.round(app.activeDocument.width.value) + "_x_" +
+      Math.round(app.activeDocument.height.value) +
+      '_' + '.tif'));
+
+      undo(historyStatus);
     }
-    resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
-    resizeForDivision(divisionWidthsArr[j],"left");
-    resizeForDivision(divisionWidthsArr[j]+merger,"left");
-    frame ();
-    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
-    Math.round(app.activeDocument.width.value) + "_x_" +
-    Math.round(app.activeDocument.height.value) +
-    '_' + '.tif'));
-    undo(historyStatus);
-  } else {
-    saveState();
-    summ = 0;
-    for (var i = 0; i < j; i++) {
-      summ = summ + divisionWidthsArr[i];
-    }
-    resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
-    frame ();
-    SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
-    Math.round(app.activeDocument.width.value) + "_x_" +
-    Math.round(app.activeDocument.height.value) +
-    '_' + '.tif'));
-    undo(historyStatus);
+
   }
 
+  //undo all
+  undo (startHistory);
+
 }
+
+
+
 
 ///////////////////////////////////
 
@@ -212,6 +258,14 @@ function frame () {
   app.backgroundColor.cmyk =  whiteColorObj;
 }
 
+function resolutionDown(num){
+  app.activeDocument.resizeImage(
+    null,
+    null,
+    num,
+    ResampleMethod.BICUBIC
+  );
+}
 
 // SaveTIFF(new File(folderLoc + Name + ' ' + '.tif'));
 
@@ -225,8 +279,7 @@ tiffSaveOptions.imageCompression = TIFFEncoding.TIFFLZW;
 activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 }
 
-//undo all
-undo (startHistory);
+
 
 // reset Units
 preferences.rulerUnits = originalUnit;
