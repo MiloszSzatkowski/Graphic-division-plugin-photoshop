@@ -39,7 +39,7 @@ var gScriptResult;
 
 #include df.js;
 
-var pref = blockout;
+var pref = epson;
 
 // alert(pref.material);
 
@@ -173,6 +173,8 @@ function divide (){
       if (j === 0) {
         saveState();
         resizeForDivision(divisionWidthsArr[j]+overlap,"left");
+
+        drawLines("right");
         frame ();
 
         SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
@@ -190,6 +192,7 @@ function divide (){
         resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
         resizeForDivision(divisionWidthsArr[j]+overlap,"left");
 
+        drawLines("both");
         frame ();
 
         SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
@@ -205,6 +208,8 @@ function divide (){
           summ = summ + divisionWidthsArr[i];
         }
         resizeForDivision(app.activeDocument.width.value - summ + overlap*j,"right");
+
+        drawLines("left");
         frame ();
 
         SaveTIFF(new File(folderLoc + Name + suffix + "_0" + (j+1) + "_" +
@@ -303,16 +308,80 @@ function frame () {
   app.backgroundColor.cmyk =  whiteColorObj;
 }
 
-function resolutionDown(num){
-  app.activeDocument.resizeImage(
-    null,
-    null,
-    num,
-    ResampleMethod.BICUBIC
-  );
+function ParaDrawLines (startXY, endXY, width ) {
+  // two element array of numbers for x,y start of line,
+// two element array of numbers for x,y endof line,
+//number;line width in pixels
+// uses foreground color
+     var desc = new ActionDescriptor();
+        var lineDesc = new ActionDescriptor();
+            var startDesc = new ActionDescriptor();
+            startDesc.putUnitDouble( charIDToTypeID('Hrzn'), charIDToTypeID('#Pxl'), startXY[0] );
+            startDesc.putUnitDouble( charIDToTypeID('Vrtc'), charIDToTypeID('#Pxl'), startXY[1] );
+        lineDesc.putObject( charIDToTypeID('Strt'), charIDToTypeID('Pnt '), startDesc );
+            var endDesc = new ActionDescriptor();
+            endDesc.putUnitDouble( charIDToTypeID('Hrzn'), charIDToTypeID('#Pxl'), endXY[0] );
+            endDesc.putUnitDouble( charIDToTypeID('Vrtc'), charIDToTypeID('#Pxl'), endXY[1] );
+        lineDesc.putObject( charIDToTypeID('End '), charIDToTypeID('Pnt '), endDesc );
+        lineDesc.putUnitDouble( charIDToTypeID('Wdth'), charIDToTypeID('#Pxl'), width );
+    desc.putObject( charIDToTypeID('Shp '), charIDToTypeID('Ln  '), lineDesc );
+    desc.putBoolean( charIDToTypeID('AntA'), true );
+    executeAction( charIDToTypeID('Draw'), desc, DialogModes.NO );
 }
 
-// SaveTIFF(new File(folderLoc + Name + ' ' + '.tif'));
+var startPoint, endPoint, lineWidth, lines, y_cord, initialCmyk, multi;
+
+function drawLines (side){
+  //
+  // //make foreground black
+  // initialCmyk = app.foreground.cmyk;
+  // app.foreground.cmyk =  blackColorObj;
+
+  //correct inch to cm
+  multi = app.activeDocument.resolution/2.54;
+
+  lines = [];
+  lineWidth = pref.lineWidth * multi;
+  lineLongitude = pref.lineLongitude * multi;
+
+  //index has to be an integer
+  num_of_lines = parseInt(Math.ceil( app.activeDocument.height.value / pref.lines_Distance));
+
+  // populate array accord.:
+  // passing array values to drawing function
+  // startPoint = [118,434];
+  // endPoint = [335,434];
+
+  if (side == "right" || side == "both"){
+    for (var i = 1; i < num_of_lines+1; i++) {
+      y_cord = pref.lines_Distance*i;
+      lines[i] =  {
+        start : [ app.activeDocument.width.value - lineLongitude , y_cord],
+        end : [ app.activeDocument.width.value , y_cord]
+      }
+
+    }
+  } else if (side == "left" || side == "both") {
+    for (var i = 1; i < num_of_lines+1; i++) {
+      y_cord = pref.lines_Distance*i;
+
+      lines[i] =  {
+        start : [ 0, y_cord],
+        end : [ lineLongitude , y_cord]
+      }
+
+    }
+  }
+
+  // alert(lines[1].start)
+
+  //for every object in array, draw line
+  for (var i = 1; i < lines.length; i++) {
+    ParaDrawLines ( lines[i].start , lines[i].end , lineWidth);
+  }
+  //make foreground to whatever color it was
+   // app.foreground.cmyk = initialCmyk;
+}
 
 function SaveTIFF(saveFile){
 tiffSaveOptions = new TiffSaveOptions();
@@ -323,8 +392,6 @@ tiffSaveOptions.imageCompression = TIFFEncoding.TIFFLZW;
 // tiffSaveOptions.jpegQuality=12;
 activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 }
-
-
 
 // reset Units
 preferences.rulerUnits = originalUnit;

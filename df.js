@@ -9,7 +9,10 @@ var baner = new PrefObj(
   71, //minimumDivision
   80, //optimalDivision
   true, //optimal
-  "_br_bryt_" // suffix
+  "_br_bryt_", // suffix
+  50, //lines_Distance
+  0.1, //lineWidth
+  1 //lineLongitude
 );
 
 var blockout = new PrefObj(
@@ -23,7 +26,10 @@ var blockout = new PrefObj(
   71, //minimumDivision
   80, //optimalDivision
   true, //optimal
-  "_bt_bryt_" // suffix
+  "_bt_bryt_", // suffix
+  50, //lines_Distance
+  0.1, //lineWidth
+  1 //lineLongitude
 );
 
 var epson = new PrefObj(
@@ -37,7 +43,10 @@ var epson = new PrefObj(
   71, //minimumDivision
   80, //optimalDivision
   true, //optimal
-  "_en_bryt_" // suffix
+  "_en_bryt_", // suffix
+  50, //lines_Distance
+  1, //lineWidth
+  100 //lineLongitude
 );
 
 function PrefObj (
@@ -51,7 +60,10 @@ function PrefObj (
   minimumDivision,
   optimalDivision,
   optimal,
-  suffix
+  suffix,
+  lines_Distance,
+  lineWidth,
+  lineLongitude
   )   {
   this.overlapWithGraphic = overlapWithGraphic;
   this.addScaffolding = addScaffolding;
@@ -64,4 +76,7 @@ function PrefObj (
   this.optimalDivision = optimalDivision;
   this.optimal = optimal;
   this.suffix = suffix;
+  this.lines_Distance = lines_Distance;
+  this.lineWidth = lineWidth;
+  this.lineLongitude = lineLongitude;
 }
