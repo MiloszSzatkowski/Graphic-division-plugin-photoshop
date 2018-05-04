@@ -18,24 +18,8 @@ var gScriptResult;
 //no dialogs
 // displayDialogs = DialogModes.NO  ;
 
-//add json parser
-// var scriptF = new File((new File($.fileName)).parent + "/json2.js");
-//     scriptF.open('r');
-//     var jsonParser = scriptF.read();
-//     scriptF.close();
-
-//config
-
-// var jsfile = new File((new File($.fileName)).parent + "/Config/default.js");
-//
-//      jsfile.open("r");
-//      config = eval(jsfile.read());
-//      jsfile.close();
-
-//write to js
-// jsfile.open('w')
-// jsfile.write(data.toSource())
-// jsfile.close()
+var initialBuffer = preferences.numberOfHistoryStates;
+var preferences.numberOfHistoryStates = 60;
 
 //colors
 //background templates
@@ -468,3 +452,4 @@ activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 
 // reset Units
 preferences.rulerUnits = originalUnit;
+var preferences.numberOfHistoryStates = initialBuffer;
