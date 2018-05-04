@@ -49,6 +49,8 @@ var epson = new PrefObj(
   1 //lineLongitude
 );
 
+var choosePref = [baner,blockout,epson];
+
 function PrefObj (
   overlapWithGraphic,
   addScaffolding,

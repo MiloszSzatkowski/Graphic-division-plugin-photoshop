@@ -37,19 +37,7 @@ var gScriptResult;
 // jsfile.write(data.toSource())
 // jsfile.close()
 
-#include df.js;
-
-var pref = epson;
-
-// alert(pref.material);
-
-//save history state
-var startHistory;
-
-//units
-var originalUnit = preferences.rulerUnits;
-preferences.rulerUnits = Units.CM;
-
+//colors
 //background templates
   //white
   var whiteColorObj = new CMYKColor();
@@ -62,12 +50,71 @@ preferences.rulerUnits = Units.CM;
     blackColorObj.cyan = bm;  blackColorObj.magenta  = bm;
     blackColorObj.yellow = bm;  blackColorObj.black = bm;
 
+#include df.js;
+
+var win, windowResource;
+
+alert("Można brytować tylko otwarte dokumenty, w innym przypadku operacja zostanie zatrzymana / You can divide only opened documents. Otherwise operation will be terminated.");
+
+windowResource =
+  "dialog {  \
+      orientation: 'column', \
+      alignChildren: ['fill', 'top'],  \
+      preferredSize:[300, 130], \
+      text: 'Wybierz szablon brytowania / Check division template',  \
+      margins:15, \
+      \
+      bottomGroup: Group{ \
+        dropdown0:DropDownList{bounds:[350,100,500,150],properties:{items:['baner','blockout','epson']}}\
+        cancelButton: Button { text: 'Cancel / Anuluj', properties:{name:'cancel'}, size: [120,24], alignment:['right', 'center'] }, \
+        applyButton: Button { text: 'Ok', properties:{name:'ok'}, size: [120,24], alignment:['right', 'center'] }, \
+      }\
+  }"
+;
+
+win = new Window(windowResource);
+
+win.bottomGroup.cancelButton.onClick = function() {
+  win.close();
+};
+
+var pref, l_color;
+win.bottomGroup.applyButton.onClick = function() {
+  var shrt = win.bottomGroup.dropdown0.selection.toString();
+  if (shrt==win.bottomGroup.dropdown0.properties.items[2].toString()) {
+    pref = epson;
+    alert("Wybierz kolor znacznikow / Select color of lines ");
+    app.showColorPicker();
+    l_color = app.foregroundColor.cmyk;
+    app.foregroundColor.cmyk = blackColorObj;
+  }
+  else if (shrt==win.bottomGroup.dropdown0.properties.items[1].toString()) {
+    pref = blockout;
+  }
+  else if (shrt==win.bottomGroup.dropdown0.properties.items[0].toString()) {
+    pref = baner;
+  } else {
+    alert("Nothing selected / Nic nie zostało zaznaczone");
+  }
+  win.close();
+};
+// var pref = baner;
+
+win.show();
+
+// alert(pref.material);
+
+//save history state
+var startHistory;
+
+//units
+var originalUnit = preferences.rulerUnits;
+preferences.rulerUnits = Units.CM;
+
 //background to white
 app.backgroundColor.cmyk =  whiteColorObj;
 
 //add new layer in case the image is flat (faster than catch(e))
-var newLayerRef = app.activeDocument.artLayers.add();
-    app.activeDocument.mergeVisibleLayers();
 
 var widthTreshold = pref.widthTreshold;
 var overlap = pref.overlap;
@@ -101,9 +148,8 @@ var Sum;
 
 if (lastDivision < minimumDivision && optimal == true) {
 var Deq = optimalDivision - lastDivision;
-Sum = lastDivision + Deq;
-lastDivision = Sum;
-preLastDivision = maximumDivision - Sum;
+lastDivision = optimalDivision;
+preLastDivision = maximumDivision - Deq;
 lastDivisionIsTooSmall = true;
 } else if (optimal === false) {
 Sum = maximumDivision + lastDivision;
@@ -133,8 +179,16 @@ if (!lastDivisionIsTooSmall) {
 // alert(resizeCanvas().toString());
 // alert(divisionWidthsArr.toString());
 
+
+
 // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
-var myPath;
+if (pref!==null && pref!==undefined) {
+  var myPath = decodeURI(Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false).fsName);
+}
+// var myPath = new File((new File($.fileName)).parent);
+// var myPath = app.activeDocument.path;
+// var fileS = myPath.getFiles()[0].parent;
+// myPath = fileS;
 // alert(myPath);
 
 var folderLoc;
@@ -150,16 +204,27 @@ var summ;
 
 ////////////////////////////////////////////////////////////////////
 // all documents
-for (var i = 0; i < app.documents.length; i++) {
-  app.activeDocument = app.documents[i];
-  divide ();
+if (app.documents.length===0) {
+  alert("Otwórz dokumenty do przetworzenia / Open files for processing");
+} else {
+  loop();
+}
+
+function loop() {
+  for (var i = 0; i < app.documents.length; i++) {
+    app.activeDocument = app.documents[i];
+    app.activeDocument.flatten();
+    if (myPath===null || myPath===undefined) {
+      alert("Path error / Blad sciezki !")
+    } else {
+      divide ();
+    }
+  }
 }
 
 //////////////////
 
 function divide (){
-
-  myPath = (app.activeDocument.path);
 
   folderLoc = new Folder(myPath) + "/";
 
@@ -333,10 +398,9 @@ function ParaDrawLines (startXY, endXY, width ) {
 var startPoint, endPoint, lineWidth, lines, y_cord, initialCmyk, multi, factor, lines_Distance;
 
 function drawLines (side){
-  //
-  // //make foreground black
-  // initialCmyk = app.foreground.cmyk;
-  // app.foreground.cmyk =  blackColorObj;
+
+  app.foregroundColor.cmyk =  l_color;
+  app.backgroundColor.cmyk =  l_color;
 
   //correct cm to px
   app.preferences.rulerUnits = Units.CM;
@@ -386,9 +450,9 @@ function drawLines (side){
   for (var i = 1; i < lines.length; i++) {
     ParaDrawLines ( lines[i].start , lines[i].end , lineWidth);
   }
-  //make foreground to whatever color it was
-   // app.foreground.cmyk = initialCmyk;
 
+   app.foregroundColor.cmyk =  blackColorObj;
+   app.backgroundColor.cmyk =  whiteColorObj;
    app.preferences.rulerUnits = Units.CM;
 }
 
