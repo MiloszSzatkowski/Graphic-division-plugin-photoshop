@@ -1,7 +1,7 @@
 var baner = new PrefObj(
+  "Banery i siatki | Banners and meshes."  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
-  500.5, //widthTreshold
   1, //overlap
   4, //merger
   0.2, //frameSize
@@ -16,9 +16,9 @@ var baner = new PrefObj(
 );
 
 var blockout = new PrefObj(
+  "Blockout jednostronny | One-sided blockout ."  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
-  300, //widthTreshold
   1, //overlap
   4, //merger
   0.2, //frameSize
@@ -33,9 +33,9 @@ var blockout = new PrefObj(
 );
 
 var epson = new PrefObj(
+  "Tekstylia | Textiles." ,//name
   true, //overlapWithGraphic
   true, //addScaffolding
-  290, //widthTreshold
   3, //overlap
   0, //merger
   0.2, //frameSize
@@ -52,6 +52,7 @@ var epson = new PrefObj(
 var choosePref = [baner,blockout,epson];
 
 function PrefObj (
+  name,
   overlapWithGraphic,
   addScaffolding,
   widthTreshold,
@@ -65,11 +66,11 @@ function PrefObj (
   suffix,
   lines_Distance,
   lineWidth,
-  lineLongitude
+  lineLongitude,
   )   {
+  this.name = name;
   this.overlapWithGraphic = overlapWithGraphic;
   this.addScaffolding = addScaffolding;
-  this.widthTreshold = widthTreshold;
   this.overlap = overlap;
   this.merger = merger;
   this.frameSize = frameSize;

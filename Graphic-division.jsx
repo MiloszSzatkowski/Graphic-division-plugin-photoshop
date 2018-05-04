@@ -19,7 +19,7 @@ var gScriptResult;
 // displayDialogs = DialogModes.NO  ;
 
 var initialBuffer = preferences.numberOfHistoryStates;
-var preferences.numberOfHistoryStates = 60;
+preferences.numberOfHistoryStates = 60;
 
 //colors
 //background templates
@@ -100,20 +100,12 @@ app.backgroundColor.cmyk =  whiteColorObj;
 
 //add new layer in case the image is flat (faster than catch(e))
 
-var widthTreshold = pref.widthTreshold;
 var overlap = pref.overlap;
 var merger = pref.merger;
 var frameSize = pref.frameSize;
 
 var cacheWidth = app.activeDocument.width.value;
 var cacheHeight = app.activeDocument.height.value;
-
-// alert(typeof(app.activeDocument.width.value));
-
-if (cacheWidth<widthTreshold) {
-  // alert("too short");
-  // return;
-}
 
 var maximumDivision = pref.maximumDivision;
 var minimumDivision = pref.minimumDivision;
@@ -452,4 +444,4 @@ activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 
 // reset Units
 preferences.rulerUnits = originalUnit;
-var preferences.numberOfHistoryStates = initialBuffer;
+preferences.numberOfHistoryStates = initialBuffer;
