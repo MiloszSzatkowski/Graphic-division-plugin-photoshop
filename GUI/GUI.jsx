@@ -1,7 +1,7 @@
 metaCharset='utf-8';
 
 var baner = new PrefObj(
-  "Banery i siatki | Banners and meshes."  ,//name
+  "🎂 Banery | Banner"  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
   1, //overlap
@@ -18,7 +18,7 @@ var baner = new PrefObj(
 );
 
 var blockout = new PrefObj(
-  "Blockout jednostronny | One-sided blockout ."  ,//name
+  "🏀 Blockout"  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
   1, //overlap
@@ -35,7 +35,7 @@ var blockout = new PrefObj(
 );
 
 var epson = new PrefObj(
-  "Tekstylia | Textiles." ,//name
+  "🎉 Tekstylia | Textiles" ,//name
   true, //overlapWithGraphic
   true, //addScaffolding
   3, //overlap
@@ -57,7 +57,6 @@ function PrefObj (
   name,
   overlapWithGraphic,
   addScaffolding,
-  widthTreshold,
   overlap,
   merger,
   frameSize,
@@ -87,7 +86,7 @@ function PrefObj (
 }
 
 
-var w = new Window ("dialog",
+var w = new Window ('dialog {orientation: "row", alignChildren: [" ", "top"]}',
 "Brytowanie grafiki | Graphic division", undefined, {closeButton: false});
 
 w.alignChildren = "right";
@@ -99,65 +98,101 @@ tab.preferredSize = [350,300];
 var panels = [];
 var options = [];
 
-var ToverlapWithGraphic = "Użyj łączenia z grafiki | Create overlap from graphic";
-var TaddScaffolding = "Użyj znaczników łączenia | Use merging markers.";
-var Toptimal = "Używaj mniejszych brytów, gdy to tylko możliwe | Use smaller divisions whenever possible. ";
-var Toverlap = "Szerokość łączenia się grafik | Graphics' overlap";
-var Tmerger = "Szerokość elementu zgrzewania | Width of weld.";
-var TmaximumDivision = "Maksymalna szerokość brytu | Maximal division width.";
-var TminimumDivision = "Minimalna szerokość brytu | Minimal division width.";
-var ToptimalDivision = unescape(encodeURIComponent("Szerokość do której wyrównywany jest zbyt mały bryt przy preferowaniu mniejszych brytów | Optimal width for leftovers' fixing."));
-var Tsuffix = "Suffix dodawany do nazwy | Suffix ";
-var Tlines_Distance = "Pionowa odległość pomiędzy liniami znaczników | Vertical distance between markers.";
-var TlineWidth = "Grubość znacznika | Width of marker.";
-var TlineLongitude = "Szerokość znacznika | How long is a marker.";
+var ToverlapWithGraphic = "Uzyj laczenia z grafiki | Create overlap from graphic:";
+var TaddScaffolding = "Uzyj znacznikow laczenia 🍌 Use merging markers:";
+var Toptimal = "Uzywaj mniejszych brytow, gdy to tylko mozliwe | Use smaller divisions whenever possible:";
+var Toverlap = "Szerokosc overlapu | Graphics' overlap:";
+var Tmerger = "Szerokosc zgrzewu | Width of weld:";
+var TmaximumDivision = "Maksymalna szerokosc brytu | Maximal division width:";
+var TminimumDivision = "Minimalna szerokosc brytu | Minimal division width:";
+var ToptimalDivision = "Szerokosc optymalna minimalnego brytu | Optimal width for leftovers' fixing:";
+var Tsuffix = "Suffix:";
+var Tlines_Distance = "Pionowa odleglosc pomiedzy liniami znacznikow | Vertical distance between markers:";
+var TlineWidth = "Grubosc znacznika | Width of marker:";
+var TlineLongitude = "Szerokosc znacznika | How long is a marker:";
+var Tframe = "Grubosc obrysowania | Width of framing:";
 
 for (var i = 0; i < choosePref.length; i++) {
   panels.push( tab.add ("tab", undefined, choosePref[i].name) );
   panels[i].alignChildren = "fill";
-  options[i] = panels[i].add ("panel", undefined, "Options | Opcje");
-  options[i].alignChildren = "left";
+  options[i] = panels[i].add ("panel", undefined, "Opcje lokalne | Local options");
+  options[i].alignChildren = ["fill", "fill"];
 
-  options[i].overlapWithGraphic = options[i].add("edittext", undefined, );
-                                    options[i].overlapWithGraphic.value = choosePref[i].overlapWithGraphic;
-
-  options[i].addScaffolding =     options[i].add("checkbox", undefined, TaddScaffolding);
-                                    options[i].addScaffolding.value = choosePref[i].addScaffolding;
-
-  options[i].overlap =            options[i].add("edittext", undefined, choosePref[i].overlap);
   options[i].add("statictext", undefined, Toverlap);
+  options[i].overlap = options[i].add("edittext", undefined, choosePref[i].overlap);
 
-  options[i].merger =             options[i].add("edittext", undefined, choosePref[i].merger);
   options[i].add("statictext", undefined, Tmerger);
+  options[i].merger =             options[i].add("edittext", undefined, choosePref[i].merger);
 
-  options[i].maximumDivision =    options[i].add("edittext", undefined, choosePref[i].maximumDivision);
   options[i].add("statictext", undefined, TmaximumDivision);
+  options[i].maximumDivision =    options[i].add("edittext", undefined, choosePref[i].maximumDivision);
 
-  options[i].minimumDivision =    options[i].add("edittext", undefined, choosePref[i].minimumDivision);
   options[i].add("statictext", undefined, TminimumDivision);
+  options[i].minimumDivision =    options[i].add("edittext", undefined, choosePref[i].minimumDivision);
 
-  options[i].optimalDivision =    options[i].add("edittext", undefined, choosePref[i].optimalDivision);
   options[i].add("statictext", undefined, ToptimalDivision);
+  options[i].optimalDivision =    options[i].add("edittext", undefined, choosePref[i].optimalDivision);
 
-  options[i].optimal =            options[i].add("edittext", undefined, Toptimal);
+  options[i].add("statictext", undefined, Tframe);
+  options[i].frameSize =    options[i].add("edittext", undefined, choosePref[i].frameSize);
+
+  options[i].optimal =            options[i].add("checkbox", undefined, Toptimal);
                                     options[i].optimal.value = choosePref[i].optimal;
 
+                                    options[i].add("statictext", undefined, Tsuffix);
   options[i].suffix =             options[i].add("edittext", undefined, choosePref[i].suffix);
-  options[i].add("statictext", undefined, Tsuffix);
 
-  options[i].lines_Distance =     options[i].add("edittext", undefined, choosePref[i].lines_Distance);
+
+  options[i].overlapWithGraphic = options[i].add("checkbox", undefined, ToverlapWithGraphic);
+  options[i].overlapWithGraphic.value = choosePref[i].overlapWithGraphic;
+
+  options[i].add("panel");
+
+  options[i].addScaffolding =     options[i].add("checkbox", undefined, TaddScaffolding);
+  options[i].addScaffolding.value = choosePref[i].addScaffolding;
+
   options[i].add("statictext", undefined, Tlines_Distance);
+  options[i].lines_Distance =
+  options[i].add("edittext", undefined, choosePref[i].lines_Distance);
 
-  options[i].lineWidth =          options[i].add("edittext", undefined, choosePref[i].lineWidth);
   options[i].add("statictext", undefined, TlineWidth);
+  options[i].lineWidth =          options[i].add("edittext", undefined, choosePref[i].lineWidth);
 
-  options[i].lineLongitude =      options[i].add("edittext", undefined, choosePref[i].lineLongitude);
   options[i].add("statictext", undefined, TlineLongitude);
+  options[i].lineLongitude =      options[i].add("edittext", undefined, choosePref[i].lineLongitude);
+
+  //
 
 }
 
-var buttons = w.add ("group");
-var exporta = buttons.add ("button", undefined, "Export", {name: "ok"});
-buttons.add ("button", undefined, "Cancel");
+var tab2 = w.add ("tabbedpanel");
+tab2.alignChildren = ["fill", "fill"];
+tab2.preferredSize = [550,700];
+
+var options2 = tab2.add ("panel", undefined, "Opcje globalne | Global options");
+options2.alignChildren = ["fill", "fill"];;
+
+var buttonColor = options2.add ("button", undefined, "Wybierz kolor znacznikow | Choose marker color");
+
+var colorPanel = options2.add("panel {preferredSize: [500, 10]}", undefined, "Pole koloru");
+colorPanel.graphics.backgroundColor = w.graphics.newBrush (w.graphics.BrushType.SOLID_COLOR, [0.3, 0.3, 0.3]);
+
+buttonColor.onClick = function (){
+  app.showColorPicker();
+  l_color = app.foregroundColor.cmyk;
+  colorPanel.graphics.backgroundColor = colorPanel.graphics.newBrush (w.graphics.BrushType.SOLID_COLOR, [
+    mapRGB(app.foregroundColor.rgb.red,0,255,0,1), mapRGB(app.foregroundColor.rgb.green,0,255,0,1),
+    mapRGB(app.foregroundColor.rgb.blue,0,255,0,1)]);
+}
+
+function mapRGB (num, in_min, in_max, out_min, out_max) {
+  return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+// options2
+
+var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide" , {name: "ok"});
+
+var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
 
 w.show ();
