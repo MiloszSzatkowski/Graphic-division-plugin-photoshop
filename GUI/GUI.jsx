@@ -190,9 +190,17 @@ function mapRGB (num, in_min, in_max, out_min, out_max) {
 }
 
 // options2
+var searchPath = options2.add ("statictext", undefined,
+"Program sprobuje odnalezc sciezke na automatycznie na podstawie otwartych plikow | Program will search for a path based on opened files ");
+
+
+searchPath.onClick = function(){
+  sPath.text = (app.activeDocument.path) ? app.activeDocument.fullName + " 😊" : "😖 Error";
+}
 
 var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide" , {name: "ok"});
 
 var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
+
 
 w.show ();
