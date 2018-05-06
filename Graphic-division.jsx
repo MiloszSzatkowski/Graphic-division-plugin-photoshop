@@ -231,34 +231,29 @@ preferences.numberOfHistoryStates = 60;
       return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
+    var Btest = options2.add ("button", undefined, "Btest");
+    Btest.onClick = function (){  alert("lol");}
     // options2
-    var searchPath = options2.add ("statictext", undefined,
-    "Program sprobuje odnalezc sciezke na automatycznie na podstawie otwartych plikow | Program will search for a path based on opened files ");
 
-    var searchPath2 = options2.add ("statictext", undefined,
-    "Jezeli zaden plik nie jest otwarty, nalezy wybrac folder z plikami | If no file is open, you will be asked to choose them ");
-
-    searchPath.onClick = function(){
-      sPath.text = (app.activeDocument.path) ? app.activeDocument.fullName + " 😊" : "😖 Error";
-    }
+    // searchPath.onClick = function(){
+    //   sPath.text = (app.activeDocument.path) ? app.activeDocument.fullName + " 😊" : "😖 Error";
+    // }
 
     var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
 
     var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
 
-    w.show ();
 
 var appStarted = false;
 var pref;
 
+
 okButton.onClick = function (){
-  alert("lol");
-  alert(tab.selection.compareName);
     ///// -- !!!!!!!!!!! pass values to algorithm !!!!!!!!!!! -- /////
     for (var i = 0; i < choosePref.length; i++) {
       if (tab.selection.compareName.toString() == choosePref[i].name.toString()) {
-        var tempIndex = tab.selection.index;
-        alert(tab.selection.index);
+        var tempIndex = i;
+        alert(i);
         pref = {};
 
           pref.compareName = tab.selection.compareName,
@@ -286,6 +281,14 @@ cancelButton.onClick = function (){
   appStarted = false;
   w.close();
 }
+
+var searchPath = options2.add ("statictext", undefined,
+"Program sprobuje odnalezc sciezke na automatycznie na podstawie otwartych plikow | Program will search for a path based on opened files ");
+
+var searchPath2 = options2.add ("statictext", undefined,
+"Jezeli zaden plik nie jest otwarty, nalezy wybrac folder z plikami | If no file is open, you will be asked to choose them ");
+
+w.show ();
 
 if (appStarted) {
   //save history state
@@ -358,14 +361,6 @@ if (appStarted) {
   }
 
   // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
-  var myPath ;
-  if (pref!==null && pref!==undefined) {
-    if (app.activeDocument.path != null) {
-    myPath = decodeURI(app.activeDocument.path);
-    } else {
-    myPath = decodeURI(Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false).fsName);
-    }
-  }
 
   var folderLoc;
   var suffix = pref.suffix;
@@ -380,6 +375,15 @@ if (appStarted) {
 
   ////////////////////////////////////////////////////////////////////
   // all documents
+  var myPath ;
+  if (pref!==null && pref!==undefined) {
+    if (app.documents.length !== 0) {
+      myPath = app.activeDocument.path;
+    } else {
+      myPath = Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false);
+    }
+  }
+
   var inputFolder, inputFiles;
   if (app.documents.length===0) {
     var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
@@ -392,8 +396,8 @@ if (appStarted) {
   var extension, splitPath;
   function loopThroughFolder() {
     for (var i = 0; i < inputFiles.length; i++){
-      splitPath = inputFiles[i].split(".");
-      extension = splitPath[splitPath.length];
+      splitPath = inputFiles[i].toString().split(".");
+      extension = splitPath[splitPath.length-1];
       if (
       extension=='TIF'      ||
       extension=='tif'      ||
@@ -404,6 +408,7 @@ if (appStarted) {
       ) {
         app.open(inputFiles[i]);
         calculate();
+        divide ();
         app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
       }
     }
