@@ -206,11 +206,13 @@ preferences.numberOfHistoryStates = 80;
     }
 
     var tab2 = w.add ("tabbedpanel");
-    tab2.alignChildren = 'left';
+    tab2.alignChildren = ['fill','fill'];
     tab2.preferredSize = [300,700];
 
     var options2 = tab2.add ("panel", undefined, "Opcje globalne | Global options");
-    options2.alignChildren = 'left';
+    options2.alignChildren = ['fill','fill'];
+
+    // options2.closing = options2.add("checkbox", undefined, "Zamknij plik po brytowaniu | Close file after division");
 
     var buttonColor = options2.add ("button", undefined, "Wybierz kolor znacznikow | Choose marker color");
 
@@ -235,7 +237,9 @@ preferences.numberOfHistoryStates = 80;
     // Btest.onClick = function (){  alert("lol");}
     // options2
 
-    var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
+    var okButton = options2.add ("iconbutton", undefined, ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/img.png"))));
+
+    // ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
 
     var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
 
@@ -263,6 +267,7 @@ okButton.onClick = function (){
           pref.lines_Distance = parseFloat(options[tempIndex].lines_Distance.text);
           pref.lineWidth = parseFloat(options[tempIndex].lineWidth.text);
           pref.lineLongitude = parseFloat(options[tempIndex].lineLongitude.text);
+          // pref.closing = options2.closing.value;
 
           appStarted = true;
           w.close();
@@ -278,7 +283,7 @@ cancelButton.onClick = function (){
 w.show ();
 
 if (appStarted) {
-  alert(pref.overlap)
+  // alert(pref.overlap);
   //save history state
   // var startHistory;
 
@@ -398,7 +403,10 @@ if (appStarted) {
         app.activeDocument = openedFile;
         calculate();
         divide ();
-        // app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        // if (pref.closing) {
+        //   app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        //   continue;
+        // }
       }
     }
   }
@@ -412,7 +420,10 @@ if (appStarted) {
       } else {
         calculate();
         divide ();
-        // app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        // if (pref.closing) {
+        //   app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        //   continue;
+        // }
       }
     }
   }
