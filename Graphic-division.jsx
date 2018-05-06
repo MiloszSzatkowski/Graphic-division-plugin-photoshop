@@ -19,7 +19,7 @@ var gScriptResult;
 // displayDialogs = DialogModes.NO  ;
 
 var initialBuffer = preferences.numberOfHistoryStates;
-preferences.numberOfHistoryStates = 60;
+preferences.numberOfHistoryStates = 80;
 
 //colors
 //background templates
@@ -206,11 +206,11 @@ preferences.numberOfHistoryStates = 60;
     }
 
     var tab2 = w.add ("tabbedpanel");
-    tab2.alignChildren = ["fill", "fill"];
-    tab2.preferredSize = [550,700];
+    tab2.alignChildren = 'left';
+    tab2.preferredSize = [300,700];
 
     var options2 = tab2.add ("panel", undefined, "Opcje globalne | Global options");
-    options2.alignChildren = ["fill", "fill"];;
+    options2.alignChildren = 'left';
 
     var buttonColor = options2.add ("button", undefined, "Wybierz kolor znacznikow | Choose marker color");
 
@@ -231,45 +231,38 @@ preferences.numberOfHistoryStates = 60;
       return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
-    var Btest = options2.add ("button", undefined, "Btest");
-    Btest.onClick = function (){  alert("lol");}
+    // var Btest = options2.add ("button", undefined, "Btest");
+    // Btest.onClick = function (){  alert("lol");}
     // options2
-
-    // searchPath.onClick = function(){
-    //   sPath.text = (app.activeDocument.path) ? app.activeDocument.fullName + " 😊" : "😖 Error";
-    // }
 
     var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
 
     var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
 
-
 var appStarted = false;
 var pref;
-
 
 okButton.onClick = function (){
     ///// -- !!!!!!!!!!! pass values to algorithm !!!!!!!!!!! -- /////
     for (var i = 0; i < choosePref.length; i++) {
       if (tab.selection.compareName.toString() == choosePref[i].name.toString()) {
         var tempIndex = i;
-        alert(i);
         pref = {};
 
-          pref.compareName = tab.selection.compareName,
-          pref.overlapWithGraphic = options[tempIndex].overlapWithGraphic,
-          pref.addScaffolding = options[tempIndex].addScaffolding,
-          pref.overlap = parseFloat(options[tempIndex].overlap),
-          pref.merger = parseFloat(options[tempIndex].merger),
-          pref.frameSize = parseFloat(options[tempIndex].frameSize),
-          pref.maximumDivision = parseFloat(options[tempIndex].maximumDivision),
-          pref.minimumDivision = parseFloat(options[tempIndex].minimumDivision),
-          pref.optimalDivision = parseFloat(options[tempIndex].optimalDivision),
-          pref.optimal = options[tempIndex].optimal,
-          pref.suffix = options[tempIndex].suffix,
-          pref.lines_Distance = parseFloat(options[tempIndex].lines_Distance),
-          pref.lineWidth = parseFloat(options[tempIndex].lineWidth),
-          pref.lineLongitude = parseFloat(options[tempIndex].lineLongitude)
+          pref.compareName = tab.selection.compareName;
+          pref.overlapWithGraphic = options[tempIndex].overlapWithGraphic.value;
+          pref.addScaffolding = options[tempIndex].addScaffolding.value;
+          pref.overlap = parseFloat(options[tempIndex].overlap.text);
+          pref.merger = parseFloat(options[tempIndex].merger.text);
+          pref.frameSize = parseFloat(options[tempIndex].frameSize.text);
+          pref.maximumDivision = parseFloat(options[tempIndex].maximumDivision.text);
+          pref.minimumDivision = parseFloat(options[tempIndex].minimumDivision.text);
+          pref.optimalDivision = parseFloat(options[tempIndex].optimalDivision.text);
+          pref.optimal = options[tempIndex].optimal.value;
+          pref.suffix = options[tempIndex].suffix.text;
+          pref.lines_Distance = parseFloat(options[tempIndex].lines_Distance.text);
+          pref.lineWidth = parseFloat(options[tempIndex].lineWidth.text);
+          pref.lineLongitude = parseFloat(options[tempIndex].lineLongitude.text);
 
           appStarted = true;
           w.close();
@@ -282,15 +275,10 @@ cancelButton.onClick = function (){
   w.close();
 }
 
-var searchPath = options2.add ("statictext", undefined,
-"Program sprobuje odnalezc sciezke na automatycznie na podstawie otwartych plikow | Program will search for a path based on opened files ");
-
-var searchPath2 = options2.add ("statictext", undefined,
-"Jezeli zaden plik nie jest otwarty, nalezy wybrac folder z plikami | If no file is open, you will be asked to choose them ");
-
 w.show ();
 
 if (appStarted) {
+  alert(pref.overlap)
   //save history state
   // var startHistory;
 
@@ -306,17 +294,17 @@ if (appStarted) {
   var minimumDivision, optimalDivision, divisionAmount, dividedFully, cacheWidth, cacheHeight;
   var lastDivision, preLastDivision, optimal, Sum, explicitAmount, divisionWidthsArr;
 
+  overlap = pref.overlap;
+  merger = pref.merger;
+  frameSize = pref.frameSize;
+  maximumDivision = pref.maximumDivision;
+  minimumDivision = pref.minimumDivision;
+  optimalDivision = pref.optimalDivision;
+
   function calculate() {
-    overlap = pref.overlap;
-    merger = pref.merger;
-    frameSize = pref.frameSize;
 
     cacheWidth = app.activeDocument.width.value;
     cacheHeight = app.activeDocument.height.value;
-
-    maximumDivision = pref.maximumDivision;
-    minimumDivision = pref.minimumDivision;
-    optimalDivision = pref.optimalDivision;
 
     divisionAmount = cacheWidth / maximumDivision;
 
@@ -387,7 +375,7 @@ if (appStarted) {
   var inputFolder, inputFiles;
   if (app.documents.length===0) {
     var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
-    if (inputFolder != null)  {  var inputFiles = inputFolder.getFiles();  }
+    if (inputFolder != null)  {  inputFiles = inputFolder.getFiles();  }
     loopThroughFolder();
   } else {
     loop();
@@ -406,10 +394,11 @@ if (appStarted) {
       extension=='JPEG'     ||
       extension=='JPG'
       ) {
-        app.open(inputFiles[i]);
+        openedFile = app.open(inputFiles[i]);
+        app.activeDocument = openedFile;
         calculate();
         divide ();
-        app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
+        // app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
       }
     }
   }
@@ -423,6 +412,7 @@ if (appStarted) {
       } else {
         calculate();
         divide ();
+        // app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
       }
     }
   }
