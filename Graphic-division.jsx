@@ -242,7 +242,7 @@ preferences.numberOfHistoryStates = 60;
       sPath.text = (app.activeDocument.path) ? app.activeDocument.fullName + " 😊" : "😖 Error";
     }
 
-    var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide" , {name: "ok"});
+    var okButton = options2.add ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
 
     var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
 
@@ -252,12 +252,13 @@ var appStarted = false;
 var pref;
 
 okButton.onClick = function (){
-  appStarted = true;
-  if (true) {
+  alert("lol");
+  alert(tab.selection.compareName);
     ///// -- !!!!!!!!!!! pass values to algorithm !!!!!!!!!!! -- /////
     for (var i = 0; i < choosePref.length; i++) {
       if (tab.selection.compareName.toString() == choosePref[i].name.toString()) {
         var tempIndex = tab.selection.index;
+        alert(tab.selection.index);
         pref = {};
 
           pref.compareName = tab.selection.compareName,
@@ -275,10 +276,10 @@ okButton.onClick = function (){
           pref.lineWidth = parseFloat(options[tempIndex].lineWidth),
           pref.lineLongitude = parseFloat(options[tempIndex].lineLongitude)
 
+          appStarted = true;
           w.close();
       }
     }
-  }
 }
 
 cancelButton.onClick = function (){
@@ -357,8 +358,13 @@ if (appStarted) {
   }
 
   // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
+  var myPath ;
   if (pref!==null && pref!==undefined) {
-    var myPath = decodeURI(Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false).fsName);
+    if (app.activeDocument.path != null) {
+    myPath = decodeURI(app.activeDocument.path);
+    } else {
+    myPath = decodeURI(Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false).fsName);
+    }
   }
 
   var folderLoc;
@@ -376,7 +382,7 @@ if (appStarted) {
   // all documents
   var inputFolder, inputFiles;
   if (app.documents.length===0) {
-    var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing";
+    var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
     if (inputFolder != null)  {  var inputFiles = inputFolder.getFiles();  }
     loopThroughFolder();
   } else {
