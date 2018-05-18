@@ -1,6 +1,4 @@
-// alert(pref.overlap);
-//save history state
-// var startHistory;
+preferences.numberOfHistoryStates = 80;
 
 //units
 var originalUnit = preferences.rulerUnits;
@@ -14,14 +12,14 @@ var overlap, merger, frameSize, cacheWidth, cacheHeight, maximumDivision;
 var minimumDivision, optimalDivision, divisionAmount, dividedFully, cacheWidth, cacheHeight;
 var lastDivision, preLastDivision, optimal, Sum, explicitAmount, divisionWidthsArr;
 
-overlap = pref.overlap;
-merger = pref.merger;
-frameSize = pref.frameSize;
-maximumDivision = pref.maximumDivision;
-minimumDivision = pref.minimumDivision;
-optimalDivision = pref.optimalDivision;
-
 function calculate() {
+
+  overlap = pref.overlap;
+  merger = pref.merger;
+  frameSize = pref.frameSize;
+  maximumDivision = pref.maximumDivision;
+  minimumDivision = pref.minimumDivision;
+  optimalDivision = pref.optimalDivision;
 
   cacheWidth = app.activeDocument.width.value;
   cacheHeight = app.activeDocument.height.value;
@@ -54,18 +52,62 @@ function calculate() {
   //create array with division widths or empty existing
   divisionWidthsArr = [];
 
-  if (!lastDivisionIsTooSmall) {
-    for (var i = 0; i < dividedFully; i++) {
-        divisionWidthsArr.push(maximumDivision);
+  if (manual.value == true && manualArr !== null) {
+    var passArr;
+    passArr = manualArr.toString().split(',');
+    //clean array
+    for (var i = 0; i < passArr.length; i++) {
+      if (passArr[i] == null || passArr[i] == undefined) {
+        passArr[i].splice(i, 1);
+      } else {
+        passArr[i] = parseInt(passArr[i]);
+      }
     }
-    divisionWidthsArr.push(lastDivision);
+    //sum array
+    var acc;
+    for (var i = 0; i < passArr.length; i++) {
+      acc = acc + passArr[i];
+    }
+    var calculateLast = true;
+    if (acc > app.activeDocument.width.value) {
+      calculateLast = false;
+      alert("Szerokosci brytow przekraczaja wielkosc pliku | Widths of divisions are higher than width of file");
+    }
+    //automate last divison
+    if (calculateLast) {
+      var AAAlastDivision = app.activeDocument.width.value - acc;
+    }
+    if (calculateLast) {
+      for (var i = 0; i < passArr.length; i++) {
+        divisionWidthsArr.push(passArr[i]);
+      }
+      divisionWidthsArr.push(AAAlastDivision);
+    } else {
+      for (var i = 0; i < passArr.length; i++) {
+        divisionWidthsArr.push(passArr[i]);
+      }
+    }
+    //proportional:
+  } else if (propo.value == true && manual.value == false ){
+    var propoDiv = app.activeDocument.width.value / 2;
+      for (var i = 0; i < 2; i++) {
+        divisionWidthsArr.push(propoDiv);
+      }
   } else {
-    for (var i = 0; i < dividedFully-1; i++) {
-        divisionWidthsArr.push(maximumDivision);
+    if (!lastDivisionIsTooSmall) {
+      for (var i = 0; i < dividedFully; i++) {
+          divisionWidthsArr.push(maximumDivision);
+      }
+      divisionWidthsArr.push(lastDivision);
+    } else {
+      for (var i = 0; i < dividedFully-1; i++) {
+          divisionWidthsArr.push(maximumDivision);
+      }
+      divisionWidthsArr.push(preLastDivision);
+      divisionWidthsArr.push(lastDivision);
     }
-    divisionWidthsArr.push(preLastDivision);
-    divisionWidthsArr.push(lastDivision);
   }
+
 }
 
 // var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
@@ -83,22 +125,45 @@ var summ;
 
 ////////////////////////////////////////////////////////////////////
 // all documents
+
 var myPath ;
 if (pref!==null && pref!==undefined) {
-  if (app.documents.length !== 0) {
+  if (Oldversion && app.documents.length !== 0) {
     myPath = app.activeDocument.path;
-  } else {
-    myPath = Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false);
+  } else if (Oldversion && app.documents.length === 0) {
+          if (appStarted) {
+            alert("Nie otwarto zadnych plikow | No files are opened");
+          }
+  } else if (!Oldversion){
+
+    if (app.documents.length !== 0) {
+      myPath = app.activeDocument.path;
+    } else {
+      myPath = Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false);
+    }
   }
 }
 
 var inputFolder, inputFiles;
-if (app.documents.length===0) {
-  var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
-  if (inputFolder != null)  {  inputFiles = inputFolder.getFiles();  }
-  loopThroughFolder();
-} else {
-  loop();
+if (Oldversion) {
+    if (app.documents.length===0) {
+          if (appStarted) {
+            alert("Otworz pliki do przetworzenia a potem otworz skrypt | Open files for processing first");
+          }
+    } else {
+      loop();
+    }
+} else if (!Oldversion){
+  //It is a new version
+  if (app.documents.length===0) {
+    var inputFolder = Folder.selectDialog("Otworz folder do przetworzenia / Open folder for processing");
+    if (inputFolder !== undefined && myPath !== undefined && inputFolder !== undefined && myPath !== undefined)  {
+      inputFiles = inputFolder.getFiles();
+      loopThroughFolder();
+    }
+  } else {
+    loop();
+  }
 }
 
 var extension, splitPath;
@@ -158,6 +223,7 @@ function divide (){
     if (pref.overlapWithGraphic===true) {
       if (j === 0) {
         saveState();
+
         resizeForDivision(divisionWidthsArr[j]+overlap,"left");
 
         if (pref.addScaffolding) {  drawLines("right");   }
@@ -171,6 +237,7 @@ function divide (){
         undo(historyStatus);
       } else if (j !== divisionWidthsArr.length-1) {
         saveState();
+
         summ = 0;
         for (var i = 0; i < j; i++) {
           summ = summ + divisionWidthsArr[i];
@@ -190,6 +257,7 @@ function divide (){
         undo(historyStatus);
       } else {
         saveState();
+
         summ = 0;
         for (var i = 0; i < j; i++) {
           summ = summ + divisionWidthsArr[i];
@@ -209,6 +277,7 @@ function divide (){
     } else if (pref.overlapWithGraphic===false) {
       if (j === 0) {
         saveState();
+
         resizeForDivision(divisionWidthsArr[j],"left");
         resizeForDivision(divisionWidthsArr[j]+merger,"left");
         frame ();
@@ -221,6 +290,7 @@ function divide (){
         undo(historyStatus);
       } else if (j !== divisionWidthsArr.length-1) {
         saveState();
+
         summ = 0;
         for (var i = 0; i < j; i++) {
           summ = summ + divisionWidthsArr[i];
@@ -238,6 +308,7 @@ function divide (){
         undo(historyStatus);
       } else {
         saveState();
+
         summ = 0;
         for (var i = 0; i < j; i++) {
           summ = summ + divisionWidthsArr[i];
@@ -389,4 +460,4 @@ activeDocument.saveAs(saveFile, tiffSaveOptions, true, Extension.LOWERCASE);
 
 // reset Units
 preferences.rulerUnits = originalUnit;
-preferences.numberOfHistoryStates = initialBuffer;
+preferences.numberOfHistoryStates = 20;
