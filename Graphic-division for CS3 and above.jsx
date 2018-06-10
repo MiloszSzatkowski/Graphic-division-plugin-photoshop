@@ -37,7 +37,7 @@ var gScriptResult;
       greyColorObj.yellow = cc;  greyColorObj.black = cc;
 
 var baner = new PrefObj(
-  "🎂 Banery | Banner"  ,//name
+  " Banery | Banner"  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
   1, //overlap
@@ -54,7 +54,7 @@ var baner = new PrefObj(
 );
 
 var blockout = new PrefObj(
-  "🏀 Blockout"  ,//name
+  " Blockout"  ,//name
   false, //overlapWithGraphic
   false, //addScaffolding
   1, //overlap
@@ -71,7 +71,7 @@ var blockout = new PrefObj(
 );
 
 var epson = new PrefObj(
-  "🎉 Tekstylia | Textiles" ,//name
+  " Tekstylia | Textiles" ,//name
   true, //overlapWithGraphic
   true, //addScaffolding
   3, //overlap
@@ -265,6 +265,11 @@ manual.onClick = function (){
 var propo = tab2.add ("checkbox", undefined, "Brytuj na pol | Divide by half");
 propo.value = false;
 
+byGuides = tab2.add ("checkbox", undefined, "Dziel wzgl. pionowych linii pomocniczych | Divide by guidelines");
+byGuides.value = false;
+allFiles = tab2.add ("checkbox", undefined, "Brytuj wszystkie pliki | Divide all files");
+allFiles.value = false;
+
 var okButton = tab2.add ("iconbutton", undefined, ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/img.png"))));
 
 var cancelButton = tab2.add ("button", undefined, "Anuluj | Cancel", {name: "cancel"});
@@ -325,3 +330,5 @@ w.show ();
 var Oldversion = true;
 
 #include 'Algorithm_abstracted.jsx';
+
+var end = true;

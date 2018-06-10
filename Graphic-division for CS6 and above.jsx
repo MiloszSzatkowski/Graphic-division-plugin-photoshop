@@ -39,7 +39,7 @@ var gScriptResult;
       greyColorObj.yellow = cc;  greyColorObj.black = cc;
 
     var baner = new PrefObj(
-      "🎂 Banery | Banner"  ,//name
+      " Banery | Banner"  ,//name
       false, //overlapWithGraphic
       false, //addScaffolding
       1, //overlap
@@ -56,7 +56,7 @@ var gScriptResult;
     );
 
     var blockout = new PrefObj(
-      "🏀 Blockout"  ,//name
+      " Blockout"  ,//name
       false, //overlapWithGraphic
       false, //addScaffolding
       1, //overlap
@@ -73,7 +73,7 @@ var gScriptResult;
     );
 
     var epson = new PrefObj(
-      "🎉 Tekstylia | Textiles" ,//name
+      " Tekstylia | Textiles" ,//name
       true, //overlapWithGraphic
       true, //addScaffolding
       3, //overlap
@@ -137,7 +137,7 @@ var gScriptResult;
     var options = [];
 
     var ToverlapWithGraphic = "Uzyj laczenia z grafiki | Create overlap from graphic:";
-    var TaddScaffolding = "Uzyj znacznikow laczenia 🍌 Use merging markers:";
+    var TaddScaffolding = "Uzyj znacznikow laczenia | Use merging markers:";
     var Toptimal = "Uzywaj mniejszych brytow, gdy to tylko mozliwe | Use smaller divisions whenever possible:";
     var Toverlap = "Szerokosc overlapu | Graphics' overlap:";
     var Tmerger = "Szerokosc zgrzewu | Width of weld:";
@@ -254,11 +254,16 @@ var gScriptResult;
     var propo = options2.add ("checkbox", undefined, "Brytuj na pol | Divide by half");
     propo.value = false;
 
+    byGuides = options2.add ("checkbox", undefined, "Dziel wzgl. pionowych linii pomocniczych | Divide by guidelines");
+    byGuides.value = false;
+    allFiles = options2.add ("checkbox", undefined, "Brytuj wszystkie pliki | Divide all files");
+    allFiles.value = false;
+
     var okButton = options2.add ("iconbutton", undefined, ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/img.png"))));
 
-    // ("button", undefined, "Brytuj 🍻  Divide", {name: "ok"});
+    // ("button", undefined, "Brytuj   Divide", {name: "ok"});
 
-    var cancelButton = options2.add ("button", undefined, "Anuluj ☕ Cancel", {name: "cancel"});
+    var cancelButton = options2.add ("button", undefined, "Anuluj | Cancel", {name: "cancel"});
 
 var appStarted = false;
 var pref;
@@ -321,3 +326,5 @@ if (appStarted) {
   #include 'Algorithm_abstracted.jsx';
 
 }
+
+var end = true;

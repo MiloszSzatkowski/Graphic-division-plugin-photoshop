@@ -88,11 +88,28 @@ function calculate() {
       }
     }
     //proportional:
-  } else if (propo.value == true && manual.value == false ){
+  } else if (propo.value == true && byGuides.value==false && manual.value == false ){
     var propoDiv = app.activeDocument.width.value / 2;
       for (var i = 0; i < 2; i++) {
         divisionWidthsArr.push(propoDiv);
       }
+  //by guides
+ } else if (manual.value == false && propo.value == false && byGuides.value==true) {
+
+     app.activeDocument.guides.add (Direction.VERTICAL, app.activeDocument.width.value);
+      var summm = 0;
+      for (var i = 0; i < app.activeDocument.guides.length; i++) {
+        if (i === 0) {
+          divisionWidthsArr.push (Math.round (app.activeDocument.guides[0].coordinate.value) );
+        } else if (i>0) {
+          for (var j = 0; j < i; j++) {
+            summm = summm + divisionWidthsArr[j];
+          }
+          divisionWidthsArr.push ( (Math.round (app.activeDocument.guides[i].coordinate.value)) - summm);
+          summm = 0;
+        }
+       }
+
   } else {
     if (!lastDivisionIsTooSmall) {
       for (var i = 0; i < dividedFully; i++) {
@@ -107,10 +124,9 @@ function calculate() {
       divisionWidthsArr.push(lastDivision);
     }
   }
+  // alert ( divisionWidthsArr.toString() );
 
 }
-
-// var myPath = (app.activeDocument.path).toString().replace(/\\/g, '/');
 
 var folderLoc;
 var suffix = pref.suffix;
@@ -129,7 +145,7 @@ var summ;
 var myPath ;
 if (pref!==null && pref!==undefined) {
   if (Oldversion && app.documents.length !== 0) {
-    myPath = app.activeDocument.path;
+    tryGettingPath();
   } else if (Oldversion && app.documents.length === 0) {
           if (appStarted) {
             alert("Nie otwarto zadnych plikow | No files are opened");
@@ -137,10 +153,18 @@ if (pref!==null && pref!==undefined) {
   } else if (!Oldversion){
 
     if (app.documents.length !== 0) {
-      myPath = app.activeDocument.path;
+      tryGettingPath();
     } else {
       myPath = Folder.selectDialog("Select output folder / Wybierz folder wyjsciowy", false, false);
     }
+  }
+}
+
+function tryGettingPath() {
+  try {
+    myPath = app.activeDocument.path;
+  } catch (e) {
+    myPath = app.recentFiles[0];
   }
 }
 
@@ -183,28 +207,32 @@ function loopThroughFolder() {
       app.activeDocument = openedFile;
       calculate();
       divide ();
-      // if (pref.closing) {
-      //   app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
-      //   continue;
-      // }
     }
   }
 }
 
 function loop() {
-  for (var i = 0; i < app.documents.length; i++) {
-    app.activeDocument = app.documents[i];
-    app.activeDocument.flatten();
+  if (allFiles.value == true) {
+    for (var i = 0; i < app.documents.length; i++) {
+      app.activeDocument = app.documents[i];
+      app.activeDocument.flatten();
+      if (myPath===null || myPath===undefined) {
+        alert("Path error / Blad sciezki !")
+      } else {
+        calculate();
+        divide ();
+      }
+    }
+  } else {
     if (myPath===null || myPath===undefined) {
       alert("Path error / Blad sciezki !")
     } else {
       calculate();
       divide ();
-      // if (pref.closing) {
-      //   app.activeDocument.close(SaveOptions.DONOTSAVECHANGES);
-      //   continue;
-      // }
     }
+  }
+  if (myPath == app.recentFiles[0]) {
+    alert('Pliki zapisane do | Files saved to: ' + myPath);
   }
 }
 
