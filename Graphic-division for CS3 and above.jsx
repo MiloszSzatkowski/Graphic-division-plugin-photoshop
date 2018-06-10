@@ -265,7 +265,7 @@ manual.onClick = function (){
 var propo = tab2.add ("checkbox", undefined, "Brytuj na pol | Divide by half");
 propo.value = false;
 
-byGuides = tab2.add ("checkbox", undefined, "Dziel wzgl. pionowych linii pomocniczych | Divide by guidelines");
+byGuides = tab2.add ("checkbox", undefined, "Dziel wzgl. pozycji linii pomocniczych | Divide by guidelines");
 byGuides.value = false;
 allFiles = tab2.add ("checkbox", undefined, "Brytuj wszystkie pliki | Divide all files");
 allFiles.value = false;

@@ -96,6 +96,11 @@ function calculate() {
   //by guides
  } else if (manual.value == false && propo.value == false && byGuides.value==true) {
 
+   if (Oldversion === true) {
+
+     alert ( 'Funkcja dostepna od wersji CS6 | Option avalaible from version CS6 up' );
+
+   } else {
      app.activeDocument.guides.add (Direction.VERTICAL, app.activeDocument.width.value);
       var summm = 0;
       for (var i = 0; i < app.activeDocument.guides.length; i++) {
@@ -109,6 +114,7 @@ function calculate() {
           summm = 0;
         }
        }
+   }
 
   } else {
     if (!lastDivisionIsTooSmall) {
