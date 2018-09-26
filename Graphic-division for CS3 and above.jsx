@@ -83,7 +83,7 @@ var epson = new PrefObj(
   true, //optimal
   "_en_bryt_", // suffix
   50, //lines_Distance
-  0.3, //lineWidth
+  0.15, //lineWidth
   1 //lineLongitude
 );
 
@@ -301,23 +301,29 @@ var pref;
         }
 
 cancelButton.onClick = function (){
-  pref = {};
-  pref.overlapWithGraphic = false;
-  pref.addScaffolding = false;
-  pref.overlap = 0;
-  pref.merger = 0;
-  pref.frameSize = 0;
-  pref.maximumDivision = 0;
-  pref.minimumDivision = 0;
-  pref.optimalDivision = 0;
-  pref.optimal = false;
-  pref.suffix = 0
-  pref.lines_Distance = 0;
-  pref.lineWidth = 0;
-  pref.lineLongitude = 0;
-  appStarted = false;
-  preferences.numberOfHistoryStates = 20;
+  try {
+    pref = {};
+    pref.overlapWithGraphic = false;
+    pref.addScaffolding = false;
+    pref.overlap = 0;
+    pref.merger = 0;
+    pref.frameSize = 0;
+    pref.maximumDivision = 0;
+    pref.minimumDivision = 0;
+    pref.optimalDivision = 0;
+    pref.optimal = false;
+    pref.suffix = 0
+    pref.lines_Distance = 0;
+    pref.lineWidth = 0;
+    pref.lineLongitude = 0;
+    appStarted = false;
+    preferences.numberOfHistoryStates = 20;
+  } catch (e) {
+    w.close();
+    return;
+  }
   w.close();
+  return;
 }
 
 myDropdown.selection = 2;

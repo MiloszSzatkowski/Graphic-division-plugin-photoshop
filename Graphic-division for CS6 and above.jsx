@@ -85,7 +85,7 @@ var gScriptResult;
       true, //optimal
       "_en_bryt_", // suffix
       50, //lines_Distance
-      0.3, //lineWidth
+      0.15, //lineWidth
       1 //lineLongitude
     );
 
@@ -259,7 +259,7 @@ var gScriptResult;
     allFiles = options2.add ("checkbox", undefined, "Brytuj wszystkie pliki | Divide all files");
     allFiles.value = false;
 
-    var okButton = options2.add ("iconbutton", undefined, ScriptUI.newImage (File(new File((new File($.fileName)).parent +"/img.png"))));
+    var okButton = options2.add ("button", undefined, 'Divide || Brytuj');
 
     // ("button", undefined, "Brytuj   Divide", {name: "ok"});
 
